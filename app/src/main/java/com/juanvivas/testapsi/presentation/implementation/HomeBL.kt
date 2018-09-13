@@ -23,19 +23,25 @@ class HomeBL(val listener: IHomeListener) : IHomeBL {
                 val value = (objectResponse as ArrayList<LinkedTreeMap<Any, Any>>)
                 value.forEach {
                     val mainContent = it["mainContent"]
-                    (mainContent as ArrayList<LinkedTreeMap<Any, Any>>).forEach {
-                        val content = it["contents"]
-                        (content as ArrayList<LinkedTreeMap<Any, Any>>).forEach {
-                            val records = it["records"]
-                            (records as ArrayList<LinkedTreeMap<Any, Any>>).forEach {
-                                val response = Search()
-                                val detailsAction = it["detailsAction"] as LinkedTreeMap<Any, Any>
-                                response.path = (detailsAction)["recordState"].toString()
-                                val attributes = it["attributes"] as LinkedTreeMap<Any, Any>
-                                response.title = ((attributes)["product.displayName"] as ArrayList<String>).first().toString()
-                                response.price = ((attributes)["sortPrice"] as ArrayList<String>).first().toString()
-                                response.image = ((attributes)["sku.thumbnailImage"] as ArrayList<String>).first().toString()
-                                data.add(response)
+                    if (mainContent != null) {
+                        (mainContent as ArrayList<LinkedTreeMap<Any, Any>>).forEach {
+                            val content = it["contents"]
+                            if (content != null) {
+                                (content as ArrayList<LinkedTreeMap<Any, Any>>).forEach {
+                                    val records = it["records"]
+                                    if (records != null) {
+                                        (records as ArrayList<LinkedTreeMap<Any, Any>>).forEach {
+                                            val response = Search()
+                                            val detailsAction = it["detailsAction"] as LinkedTreeMap<Any, Any>
+                                            response.path = (detailsAction)["recordState"].toString()
+                                            val attributes = it["attributes"] as LinkedTreeMap<Any, Any>
+                                            response.title = ((attributes)["product.displayName"] as ArrayList<String>).first().toString()
+                                            response.price = ((attributes)["sortPrice"] as ArrayList<String>).first().toString()
+                                            response.image = ((attributes)["sku.thumbnailImage"] as ArrayList<String>).first().toString()
+                                            data.add(response)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

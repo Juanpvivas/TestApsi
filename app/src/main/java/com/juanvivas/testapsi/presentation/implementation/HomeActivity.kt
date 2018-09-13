@@ -26,7 +26,6 @@ class HomeActivity : BaseView(), IHomeActivity {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         presenter = HomePresenter(this)
-        search = "computadora"
     }
 
     override fun onResume() {
