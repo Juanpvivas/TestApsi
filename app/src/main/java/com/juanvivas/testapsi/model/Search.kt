@@ -1,6 +1,10 @@
 package com.juanvivas.testapsi.model
 
-class Search : BaseModel() {
-    //var contents: ArrayList<MainContent>? = null
-    var contents: String? = null
+import io.realm.RealmObject
+
+open  class Search() : RealmObject() {
+    var title: String? = null
+    var path: String? = null
+    var price: String? = null
+    var image: String? = null
 }

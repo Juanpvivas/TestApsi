@@ -3,4 +3,7 @@
     <string name="networkError">Error de red</string>
     <string name="fail_proxy_service">Error en el Servicio de Internet</string>
     <string name="common_error">Error</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

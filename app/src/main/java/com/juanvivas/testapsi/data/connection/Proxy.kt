@@ -1,15 +1,11 @@
 package com.juanvivas.testapsi.data.connection
 
-import com.google.gson.Gson
 import com.google.gson.internal.LinkedTreeMap
 import com.juanvivas.testapsi.R
-import com.juanvivas.testapsi.model.App
-import com.juanvivas.testapsi.model.BaseModel
-import com.juanvivas.testapsi.model.MainContent
-import com.juanvivas.testapsi.model.MessageResponse
+import com.juanvivas.testapsi.model.*
 import com.juanvivas.testapsi.utils.Constants
 import com.juanvivas.testapsi.utils.Tools
-import com.juanvivas.testapsi.utils.toJsonString
+
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -66,56 +62,27 @@ class Proxy<T : BaseModel> {
                 }
 
                 call?.enqueue(object : Callback<Any> {
+
                     override fun onResponse(call: Call<Any>?, response: Response<Any>?) {
-                        when (response?.code()) {
-                            Constants.HttpCodes.OK -> {
-                                var objectResponse: Any? = null
-                                if (response.body() != null) {
-                                    if (response.body() is LinkedTreeMap<*, *>) {
-                                        var content = (response.body() as Map<String, Any?>).getValue("contents")
-                                        var mainContent = Any()
-                                        for (map in content as ArrayList<LinkedTreeMap<Any, Any>>) {
-                                            mainContent = map.getValue("mainContent")
-                                        }
+                        try {
+                            when (response?.code()) {
 
-                                        for (map in mainContent as ArrayList<LinkedTreeMap<Any, Any>>) {
-                                            content = map.getValue("contents")
+                                Constants.HttpCodes.OK -> {
+                                    try {
+                                        if (response.body() != null) {
+                                            if (response.body() is LinkedTreeMap<*, *>) {
+                                                val contents = (response.body() as LinkedTreeMap<Any, Any>).getValue("contents")
+                                                responder.onSuccessResponse(contents, serviceTag)
+                                            }
                                         }
-                                        for (map in content as ArrayList<LinkedTreeMap<Any, Any>>) {
-                                            mainContent = map.getValue("records")
-                                        }
-                                        //val model = BaseModel.objectFromJson((response.body() as LinkedTreeMap<Any, Any>).toJsonString(), type)
-                                        //responder.onSuccessResponse(model, serviceTag)
-                                    } else if (response.body() is ArrayList<*>) {
-                                        val array = BaseModel.arrayFromJson(response.body() as ArrayList<LinkedTreeMap<Any, Any>>, type)
-                                        responder.onSuccessResponse(array, serviceTag)
-                                    } else {
-                                        responder.onSuccessResponse(null, serviceTag)
-
+                                    } catch (ex: Exception) {
+                                        ex.printStackTrace()
                                     }
-
-                                } else {
-                                    responder.onSuccessResponse(objectResponse, serviceTag)
                                 }
                             }
-                            else -> {
-                                val messageResponse: MessageResponse
-                                if (response?.errorBody() == null) {
-                                    messageResponse = MessageResponse(response?.code()!!, App.mContext!!.resources.getString(R.string.fail_proxy_service))
-                                } else {
-                                    messageResponse = MessageResponse(response?.code()!!, response.errorBody()?.string())
-                                }
-                                responder.onFailedResponse(messageResponse, serviceTag)
-                            }
+                        } catch (ex: Exception) {
+                            ex.printStackTrace()
                         }
-                    }
-
-                    fun getData(mContent: ArrayList<LinkedTreeMap<Any, Any>>, tag: String): Any {
-                        var content = Any()
-                        for (map in mContent) {
-                            content = map.getValue(tag)
-                        }
-                        return content
                     }
 
                     override fun onFailure(call: Call<Any>?, t: Throwable?) {
@@ -123,6 +90,7 @@ class Proxy<T : BaseModel> {
                         responder.onFailedResponse(messageResponse, serviceTag)
                     }
                 })
+
             }
         }
     }
